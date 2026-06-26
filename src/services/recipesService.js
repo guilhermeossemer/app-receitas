@@ -2,7 +2,7 @@ import {
   collection,
   deleteDoc,
   doc,
-  onSnapshot,
+  getDocs,
   serverTimestamp,
   setDoc,
   updateDoc
@@ -25,25 +25,20 @@ function recipeDocument(uid, recipeId) {
   return doc(db, 'users', uid, 'recipes', recipeId);
 }
 
-export function subscribeToRecipes(uid, onRecipes, onError) {
-  return onSnapshot(
-    recipesCollection(uid),
-    (snapshot) => {
-      const recipes = snapshot.docs.map((recipeDoc) => ({
-        id: recipeDoc.id,
-        ...recipeDoc.data()
-      }));
+export async function loadRecipes(uid) {
+  const snapshot = await getDocs(recipesCollection(uid));
+  const recipes = snapshot.docs.map((recipeDoc) => ({
+    id: recipeDoc.id,
+    ...recipeDoc.data()
+  }));
 
-      recipes.sort((a, b) => {
-        const aTime = a.updatedAt?.toMillis?.() || 0;
-        const bTime = b.updatedAt?.toMillis?.() || 0;
-        return bTime - aTime;
-      });
+  recipes.sort((a, b) => {
+    const aTime = a.updatedAt?.toMillis?.() || 0;
+    const bTime = b.updatedAt?.toMillis?.() || 0;
+    return bTime - aTime;
+  });
 
-      onRecipes(recipes);
-    },
-    onError
-  );
+  return recipes;
 }
 
 export async function createRecipe(uid, data) {

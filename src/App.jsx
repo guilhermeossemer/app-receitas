@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from './auth/AuthProvider';
 import { LoadingScreen } from './components/LoadingScreen';
+import { firebaseProjectId } from './firebase';
 import { EditRecipePage } from './pages/EditRecipePage';
 import { LoginPage } from './pages/LoginPage';
 import { RecipesPage } from './pages/RecipesPage';
 import { ViewRecipePage } from './pages/ViewRecipePage';
-import { subscribeToRecipes } from './services/recipesService';
+import { loadRecipes } from './services/recipesService';
 
 function initialRoute() {
   return { name: 'recipes', recipeId: null };
@@ -39,6 +40,33 @@ export default function App() {
   const [recipesError, setRecipesError] = useState('');
   const [search, setSearch] = useState('');
 
+  const refreshRecipes = useCallback(async () => {
+    if (!user) return;
+
+    setRecipesLoading(true);
+    setRecipesError('');
+
+    const loadingTimer = window.setTimeout(() => {
+      setRecipesLoading(false);
+      setRecipesError(
+        `O Firestore demorou demais para responder no projeto ${firebaseProjectId}. Confira se o banco foi criado e se as regras foram publicadas.`
+      );
+    }, 15000);
+
+    try {
+      const nextRecipes = await loadRecipes(user.uid);
+      window.clearTimeout(loadingTimer);
+      setRecipes(nextRecipes);
+      setRecipesError('');
+      setRecipesLoading(false);
+    } catch (error) {
+      window.clearTimeout(loadingTimer);
+      console.error(error);
+      setRecipesError(getRecipesErrorMessage(error));
+      setRecipesLoading(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (!user) {
       setRecipes([]);
@@ -46,35 +74,9 @@ export default function App() {
       return undefined;
     }
 
-    setRecipesLoading(true);
-    setRecipesError('');
-
-    const loadingTimer = window.setTimeout(() => {
-      setRecipesLoading(false);
-      setRecipesError('O Firestore demorou demais para responder. Confira se o banco foi criado e se as regras foram publicadas.');
-    }, 15000);
-
-    const unsubscribe = subscribeToRecipes(
-      user.uid,
-      (nextRecipes) => {
-        window.clearTimeout(loadingTimer);
-        setRecipes(nextRecipes);
-        setRecipesError('');
-        setRecipesLoading(false);
-      },
-      (error) => {
-        window.clearTimeout(loadingTimer);
-        console.error(error);
-        setRecipesError(getRecipesErrorMessage(error));
-        setRecipesLoading(false);
-      }
-    );
-
-    return () => {
-      window.clearTimeout(loadingTimer);
-      unsubscribe();
-    };
-  }, [user]);
+    refreshRecipes();
+    return undefined;
+  }, [user, refreshRecipes]);
 
   if (initializing) {
     return <LoadingScreen />;
@@ -91,7 +93,10 @@ export default function App() {
       <EditRecipePage
         user={user}
         onCancel={() => setRoute(initialRoute())}
-        onSaved={(recipeId) => setRoute({ name: 'view', recipeId })}
+        onSaved={async (recipeId) => {
+          await refreshRecipes();
+          setRoute({ name: 'view', recipeId });
+        }}
       />
     );
   }
@@ -102,7 +107,10 @@ export default function App() {
         user={user}
         recipe={selectedRecipe}
         onCancel={() => setRoute({ name: 'view', recipeId: route.recipeId })}
-        onSaved={(recipeId) => setRoute({ name: 'view', recipeId })}
+        onSaved={async (recipeId) => {
+          await refreshRecipes();
+          setRoute({ name: 'view', recipeId });
+        }}
       />
     );
   }
@@ -114,7 +122,10 @@ export default function App() {
         recipe={selectedRecipe}
         onBack={() => setRoute(initialRoute())}
         onEdit={() => setRoute({ name: 'edit', recipeId: route.recipeId })}
-        onDeleted={() => setRoute(initialRoute())}
+        onDeleted={async () => {
+          await refreshRecipes();
+          setRoute(initialRoute());
+        }}
       />
     );
   }
@@ -130,6 +141,8 @@ export default function App() {
       onNew={() => setRoute({ name: 'new', recipeId: null })}
       onOpen={(recipeId) => setRoute({ name: 'view', recipeId })}
       onLogout={logout}
+      onReload={refreshRecipes}
+      onRecipesChanged={refreshRecipes}
     />
   );
 }

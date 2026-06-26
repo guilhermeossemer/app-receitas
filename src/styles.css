@@ -271,6 +271,20 @@ button:disabled {
   color: var(--accent-dark);
 }
 
+.message-with-action {
+  display: grid;
+  gap: 12px;
+}
+
+.message-with-action p {
+  margin: 0;
+}
+
+.message-with-action .secondary-button {
+  width: fit-content;
+  min-height: 42px;
+}
+
 .app-shell {
   width: min(100%, 820px);
   margin: 0 auto;

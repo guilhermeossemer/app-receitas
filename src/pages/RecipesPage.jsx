@@ -2,13 +2,26 @@ import { LogOut, Plus, Search } from 'lucide-react';
 import { RecipeCard } from '../components/RecipeCard';
 import { normalizeTitle, setRecipeFavorite } from '../services/recipesService';
 
-export function RecipesPage({ user, recipes, loading, error, search, setSearch, onNew, onOpen, onLogout }) {
+export function RecipesPage({
+  user,
+  recipes,
+  loading,
+  error,
+  search,
+  setSearch,
+  onNew,
+  onOpen,
+  onLogout,
+  onReload,
+  onRecipesChanged
+}) {
   const filteredRecipes = recipes.filter((recipe) =>
     normalizeTitle(recipe.title || '').includes(normalizeTitle(search || ''))
   );
 
   async function handleToggleFavorite(recipe) {
     await setRecipeFavorite(user.uid, recipe.id, !recipe.favorite);
+    onRecipesChanged();
   }
 
   return (
@@ -40,7 +53,14 @@ export function RecipesPage({ user, recipes, loading, error, search, setSearch, 
         </button>
       </section>
 
-      {error ? <p className="form-message error">{error}</p> : null}
+      {error ? (
+        <div className="form-message error message-with-action">
+          <p>{error}</p>
+          <button className="secondary-button" type="button" onClick={onReload}>
+            Tentar de novo
+          </button>
+        </div>
+      ) : null}
 
       {loading ? (
         <p className="empty-state">Carregando receitas...</p>

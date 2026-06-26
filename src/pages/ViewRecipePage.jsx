@@ -35,7 +35,7 @@ export function ViewRecipePage({ user, recipe, onBack, onEdit, onDeleted }) {
 
     try {
       await deleteRecipe(user.uid, recipe.id);
-      onDeleted();
+      await onDeleted();
     } catch (error) {
       console.error('Delete recipe failed:', error);
       setDeleting(false);

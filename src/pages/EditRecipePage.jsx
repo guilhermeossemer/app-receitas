@@ -92,7 +92,7 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
         );
       }
 
-      onSaved(recipeId);
+      await onSaved(recipeId);
     } catch (saveError) {
       console.error(saveError);
       setError(getSaveErrorMessage(saveError));

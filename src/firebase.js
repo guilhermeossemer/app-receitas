@@ -13,6 +13,7 @@ const firebaseConfig = {
 };
 
 export const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean);
+export const firebaseProjectId = firebaseConfig.projectId || '';
 
 export const app = hasFirebaseConfig ? initializeApp(firebaseConfig) : null;
 export const auth = app ? getAuth(app) : null;
