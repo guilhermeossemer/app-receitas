@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, BookOpenCheck, Edit3, Heart, Share2, Trash2 } from 'lucide-react';
+import { ArrowLeft, CookingPot, Edit3, Heart, Share2, Trash2 } from 'lucide-react';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { deleteRecipe, setRecipeFavorite } from '../services/recipesService';
 
@@ -105,7 +105,7 @@ export function ViewRecipePage({ user, recipe, onBack, onEdit, onDeleted }) {
           <img src={recipe.photoUrl} alt={`Foto de ${recipe.title}`} />
         ) : (
           <div className="recipe-hero-placeholder" aria-hidden="true">
-            <BookOpenCheck size={42} />
+            <CookingPot size={44} />
           </div>
         )}
       </header>

@@ -1,11 +1,11 @@
-import { BookOpen, ChefHat } from 'lucide-react';
+import { ChefHat, CookingPot } from 'lucide-react';
 
 export function LoadingScreen() {
   return (
     <main className="center-screen">
       <div className="splash-card">
         <div className="loading-mark" aria-hidden="true">
-          <BookOpen size={34} />
+          <CookingPot size={36} />
           <ChefHat size={20} className="loading-mark-badge" />
         </div>
         <div className="splash-copy">

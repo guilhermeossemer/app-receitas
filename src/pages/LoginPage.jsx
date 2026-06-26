@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BookOpen, ChefHat, LogIn, Mail, UserPlus } from 'lucide-react';
+import { ChefHat, CookingPot, LogIn, Mail, UserPlus } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
 
 const modes = {
@@ -95,7 +95,7 @@ export function LoginPage() {
         <section className="auth-panel">
           <div className="brand-lockup">
             <span className="brand-icon brand-icon-large" aria-hidden="true">
-              <BookOpen size={28} />
+              <CookingPot size={30} />
               <ChefHat size={16} className="brand-icon-badge" />
             </span>
             <div>
@@ -116,7 +116,7 @@ export function LoginPage() {
       <section className="auth-panel">
         <div className="brand-lockup">
           <span className="brand-icon brand-icon-large" aria-hidden="true">
-            <BookOpen size={28} />
+            <CookingPot size={30} />
             <ChefHat size={16} className="brand-icon-badge" />
           </span>
           <div>
