@@ -20,7 +20,7 @@ export function RecipesPage({
   );
 
   async function handleToggleFavorite(recipe) {
-    await setRecipeFavorite(user.uid, recipe.id, !recipe.favorite);
+    await setRecipeFavorite(user, recipe.id, !recipe.favorite);
     onRecipesChanged();
   }
 

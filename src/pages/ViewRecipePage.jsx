@@ -34,7 +34,7 @@ export function ViewRecipePage({ user, recipe, onBack, onEdit, onDeleted }) {
     setDeleting(true);
 
     try {
-      await deleteRecipe(user.uid, recipe.id);
+      await deleteRecipe(user, recipe.id);
       await onDeleted();
     } catch (error) {
       console.error('Delete recipe failed:', error);
@@ -62,7 +62,7 @@ export function ViewRecipePage({ user, recipe, onBack, onEdit, onDeleted }) {
             type="button"
             title={recipe.favorite ? 'Remover dos favoritos' : 'Marcar como favorito'}
             aria-label={recipe.favorite ? 'Remover dos favoritos' : 'Marcar como favorito'}
-            onClick={() => setRecipeFavorite(user.uid, recipe.id, !recipe.favorite)}
+            onClick={() => setRecipeFavorite(user, recipe.id, !recipe.favorite)}
           >
             <Heart size={22} fill={recipe.favorite ? 'currentColor' : 'none'} />
           </button>

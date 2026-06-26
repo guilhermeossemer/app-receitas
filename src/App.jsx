@@ -54,7 +54,7 @@ export default function App() {
     }, 15000);
 
     try {
-      const nextRecipes = await loadRecipes(user.uid);
+      const nextRecipes = await loadRecipes(user);
       window.clearTimeout(loadingTimer);
       setRecipes(nextRecipes);
       setRecipesError('');

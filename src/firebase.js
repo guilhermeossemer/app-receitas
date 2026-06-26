@@ -1,7 +1,5 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -17,9 +15,3 @@ export const firebaseProjectId = firebaseConfig.projectId || '';
 
 export const app = hasFirebaseConfig ? initializeApp(firebaseConfig) : null;
 export const auth = app ? getAuth(app) : null;
-export const db = app
-  ? initializeFirestore(app, {
-      experimentalForceLongPolling: true
-    })
-  : null;
-export const storage = app ? getStorage(app) : null;

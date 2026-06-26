@@ -73,7 +73,7 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
 
       if (!recipeId) {
         recipeId = await withTimeout(
-          createRecipe(user.uid, {
+          createRecipe(user, {
             title,
             category,
             content,
@@ -83,7 +83,7 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
         );
       } else {
         await withTimeout(
-          updateRecipe(user.uid, recipeId, {
+          updateRecipe(user, recipeId, {
             title,
             category,
             content

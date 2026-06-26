@@ -1,13 +1,109 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  serverTimestamp,
-  setDoc,
-  updateDoc
-} from 'firebase/firestore';
-import { db } from '../firebase';
+import { firebaseProjectId } from '../firebase';
+
+const firestoreBaseUrl = `https://firestore.googleapis.com/v1/projects/${firebaseProjectId}/databases/(default)/documents`;
+
+function createRecipeId() {
+  if (crypto?.randomUUID) {
+    return crypto.randomUUID().replace(/-/g, '');
+  }
+
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function recipeCollectionPath(uid) {
+  return `users/${encodeURIComponent(uid)}/recipes`;
+}
+
+function recipeDocumentPath(uid, recipeId) {
+  return `${recipeCollectionPath(uid)}/${encodeURIComponent(recipeId)}`;
+}
+
+function encodeValue(value) {
+  if (value instanceof Date) {
+    return { timestampValue: value.toISOString() };
+  }
+
+  if (typeof value === 'boolean') {
+    return { booleanValue: value };
+  }
+
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
+  }
+
+  return { stringValue: String(value ?? '') };
+}
+
+function encodeFields(data) {
+  return Object.fromEntries(Object.entries(data).map(([key, value]) => [key, encodeValue(value)]));
+}
+
+function decodeValue(value) {
+  if ('stringValue' in value) return value.stringValue;
+  if ('booleanValue' in value) return value.booleanValue;
+  if ('integerValue' in value) return Number(value.integerValue);
+  if ('doubleValue' in value) return value.doubleValue;
+  if ('timestampValue' in value) return new Date(value.timestampValue);
+  return '';
+}
+
+function decodeDocument(document) {
+  const documentId = document.name.split('/').pop();
+  const fields = Object.fromEntries(
+    Object.entries(document.fields || {}).map(([key, value]) => [key, decodeValue(value)])
+  );
+
+  return {
+    ...fields,
+    id: fields.id || documentId
+  };
+}
+
+function getTimestampMillis(value) {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === 'string') return Date.parse(value) || 0;
+  return 0;
+}
+
+function getFirestoreErrorCode(status) {
+  switch (status) {
+    case 'PERMISSION_DENIED':
+      return 'permission-denied';
+    case 'UNAUTHENTICATED':
+      return 'unauthenticated';
+    case 'UNAVAILABLE':
+      return 'unavailable';
+    case 'DEADLINE_EXCEEDED':
+      return 'deadline-exceeded';
+    case 'FAILED_PRECONDITION':
+      return 'failed-precondition';
+    default:
+      return status?.toLowerCase?.() || 'unknown';
+  }
+}
+
+async function requestFirestore(user, path, options = {}) {
+  const token = await user.getIdToken();
+  const response = await fetch(`${firestoreBaseUrl}/${path}${options.query || ''}`, {
+    method: options.method || 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    const error = new Error(payload.error?.message || 'Firestore request failed');
+    error.code = getFirestoreErrorCode(payload.error?.status);
+    throw error;
+  }
+
+  if (response.status === 204) return null;
+
+  return response.json();
+}
 
 export function normalizeTitle(value) {
   return value
@@ -17,54 +113,48 @@ export function normalizeTitle(value) {
     .toLowerCase();
 }
 
-function recipesCollection(uid) {
-  return collection(db, 'users', uid, 'recipes');
-}
-
-function recipeDocument(uid, recipeId) {
-  return doc(db, 'users', uid, 'recipes', recipeId);
-}
-
-export async function loadRecipes(uid) {
-  const snapshot = await getDocs(recipesCollection(uid));
-  const recipes = snapshot.docs.map((recipeDoc) => ({
-    id: recipeDoc.id,
-    ...recipeDoc.data()
-  }));
+export async function loadRecipes(user) {
+  const snapshot = await requestFirestore(user, recipeCollectionPath(user.uid));
+  const recipes = (snapshot.documents || []).map(decodeDocument);
 
   recipes.sort((a, b) => {
-    const aTime = a.updatedAt?.toMillis?.() || 0;
-    const bTime = b.updatedAt?.toMillis?.() || 0;
+    const aTime = getTimestampMillis(a.updatedAt);
+    const bTime = getTimestampMillis(b.updatedAt);
     return bTime - aTime;
   });
 
   return recipes;
 }
 
-export async function createRecipe(uid, data) {
-  const ref = doc(recipesCollection(uid));
-  const now = serverTimestamp();
+export async function createRecipe(user, data) {
+  const recipeId = createRecipeId();
+  const now = new Date();
 
-  await setDoc(ref, {
-    id: ref.id,
-    title: data.title.trim(),
-    titleLower: normalizeTitle(data.title),
-    category: data.category?.trim() || '',
-    content: data.content.trim(),
-    photoUrl: data.photoUrl || '',
-    photoPath: data.photoPath || '',
-    favorite: Boolean(data.favorite),
-    createdAt: now,
-    updatedAt: now
+  await requestFirestore(user, recipeDocumentPath(user.uid, recipeId), {
+    method: 'PATCH',
+    body: {
+      fields: encodeFields({
+        id: recipeId,
+        title: data.title.trim(),
+        titleLower: normalizeTitle(data.title),
+        category: data.category?.trim() || '',
+        content: data.content.trim(),
+        photoUrl: data.photoUrl || '',
+        photoPath: data.photoPath || '',
+        favorite: Boolean(data.favorite),
+        createdAt: now,
+        updatedAt: now
+      })
+    }
   });
 
-  return ref.id;
+  return recipeId;
 }
 
-export function updateRecipe(uid, recipeId, data) {
+export function updateRecipe(user, recipeId, data) {
   const nextData = {
     ...data,
-    updatedAt: serverTimestamp()
+    updatedAt: new Date()
   };
 
   if (data.title !== undefined) {
@@ -80,13 +170,24 @@ export function updateRecipe(uid, recipeId, data) {
     nextData.content = data.content.trim();
   }
 
-  return updateDoc(recipeDocument(uid, recipeId), nextData);
+  const params = new URLSearchParams();
+  Object.keys(nextData).forEach((key) => params.append('updateMask.fieldPaths', key));
+
+  return requestFirestore(user, recipeDocumentPath(user.uid, recipeId), {
+    method: 'PATCH',
+    query: `?${params.toString()}`,
+    body: {
+      fields: encodeFields(nextData)
+    }
+  });
 }
 
-export function deleteRecipe(uid, recipeId) {
-  return deleteDoc(recipeDocument(uid, recipeId));
+export function deleteRecipe(user, recipeId) {
+  return requestFirestore(user, recipeDocumentPath(user.uid, recipeId), {
+    method: 'DELETE'
+  });
 }
 
-export function setRecipeFavorite(uid, recipeId, favorite) {
-  return updateRecipe(uid, recipeId, { favorite });
+export function setRecipeFavorite(user, recipeId, favorite) {
+  return updateRecipe(user, recipeId, { favorite });
 }
