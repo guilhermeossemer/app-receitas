@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Minhas Receitas">
-  <rect width="64" height="64" rx="16" fill="#2F7D65"/>
+  <rect x="3" y="3" width="58" height="58" rx="19" fill="#2F7D65"/>
   <path d="M23 17.5c-2.2-2.1-2.1-5.2.1-7.2M32 17.5c-2.2-2.1-2.1-5.2.1-7.2M41 17.5c-2.2-2.1-2.1-5.2.1-7.2" fill="none" stroke="#FFFDF9" stroke-width="3.2" stroke-linecap="round"/>
   <path d="M15.5 30h33v13.2c0 6-4.8 10.8-10.8 10.8H26.3c-6 0-10.8-4.8-10.8-10.8V30Z" fill="#FFFDF9"/>
   <path d="M19 26.5h26c2.2 0 4 1.8 4 4H15c0-2.2 1.8-4 4-4Z" fill="#E2A93B"/>
