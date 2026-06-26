@@ -1,6 +1,6 @@
 # Minhas Receitas
 
-PWA simples para salvar receitas em texto livre, com login Firebase, Firestore, Storage para foto opcional e Screen Wake Lock API na leitura da receita.
+PWA simples para salvar receitas em texto livre, com login Firebase, Firestore e Screen Wake Lock API na leitura da receita.
 
 ## Rodar localmente
 
@@ -26,7 +26,6 @@ Ative no Firebase Console:
 
 - Authentication com provedor de e-mail/senha.
 - Firestore Database.
-- Storage.
 
 As receitas ficam em:
 
@@ -34,15 +33,9 @@ As receitas ficam em:
 users/{uid}/recipes/{recipeId}
 ```
 
-As fotos ficam em:
-
-```txt
-users/{uid}/recipes/{recipeId}/cover
-```
-
 ## Regras sugeridas
 
-As regras de exemplo estao em `firestore.rules` e `storage.rules`. Elas permitem que cada usuario leia e escreva apenas os dados dentro da propria pasta.
+As regras de exemplo estao em `firestore.rules`. Elas permitem que cada usuario leia e escreva apenas os dados dentro da propria pasta.
 
 ## Publicar no GitHub Pages
 

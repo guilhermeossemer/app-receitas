@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Camera, Save, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowLeft, Save, X } from 'lucide-react';
 import { createRecipe, updateRecipe } from '../services/recipesService';
-import { deleteRecipePhoto, uploadRecipePhoto } from '../services/storageService';
 
 const SAVE_TIMEOUT_MS = 30000;
 
@@ -48,8 +47,6 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
   const [title, setTitle] = useState(recipe?.title || '');
   const [category, setCategory] = useState(recipe?.category || '');
   const [content, setContent] = useState(recipe?.content || '');
-  const [photoFile, setPhotoFile] = useState(null);
-  const [removePhoto, setRemovePhoto] = useState(false);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -57,28 +54,7 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
     setTitle(recipe?.title || '');
     setCategory(recipe?.category || '');
     setContent(recipe?.content || '');
-    setPhotoFile(null);
-    setRemovePhoto(false);
   }, [recipe]);
-
-  const selectedPhotoUrl = useMemo(() => {
-    if (photoFile) return URL.createObjectURL(photoFile);
-    return '';
-  }, [photoFile]);
-
-  const previewUrl = useMemo(() => {
-    if (selectedPhotoUrl) return selectedPhotoUrl;
-    if (!removePhoto && recipe?.photoUrl) return recipe.photoUrl;
-    return '';
-  }, [recipe?.photoUrl, removePhoto, selectedPhotoUrl]);
-
-  useEffect(() => {
-    return () => {
-      if (selectedPhotoUrl) {
-        URL.revokeObjectURL(selectedPhotoUrl);
-      }
-    };
-  }, [selectedPhotoUrl]);
 
   async function handleSave(event) {
     event.preventDefault();
@@ -120,23 +96,6 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
         );
       }
 
-      if (photoFile) {
-        const photo = await withTimeout(
-          uploadRecipePhoto(user.uid, recipeId, photoFile, recipe?.photoPath),
-          'Enviar foto'
-        );
-        await withTimeout(updateRecipe(user.uid, recipeId, photo), 'Salvar foto na receita');
-      } else if (removePhoto && recipe?.photoPath) {
-        await withTimeout(deleteRecipePhoto(recipe.photoPath), 'Remover foto');
-        await withTimeout(
-          updateRecipe(user.uid, recipeId, {
-            photoUrl: '',
-            photoPath: ''
-          }),
-          'Atualizar receita sem foto'
-        );
-      }
-
       onSaved(recipeId);
     } catch (saveError) {
       console.error(saveError);
@@ -168,40 +127,6 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
           Categoria
           <input value={category} onChange={(event) => setCategory(event.target.value)} placeholder="Opcional" />
         </label>
-
-        <div className="photo-editor">
-          {previewUrl ? <img src={previewUrl} alt="Foto da receita" /> : <div className="photo-placeholder">Sem foto</div>}
-          <div className="photo-actions">
-            <label className="secondary-button file-button">
-              <Camera size={20} />
-              {previewUrl ? 'Trocar foto' : 'Adicionar foto'}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    setPhotoFile(file);
-                    setRemovePhoto(false);
-                  }
-                }}
-              />
-            </label>
-            {previewUrl ? (
-              <button
-                className="ghost-button"
-                type="button"
-                onClick={() => {
-                  setPhotoFile(null);
-                  setRemovePhoto(true);
-                }}
-              >
-                <Trash2 size={20} />
-                Remover foto
-              </button>
-            ) : null}
-          </div>
-        </div>
 
         <label>
           Cole a receita aqui

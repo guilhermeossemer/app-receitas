@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { ArrowLeft, Edit3, Heart, Trash2 } from 'lucide-react';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { deleteRecipe, setRecipeFavorite } from '../services/recipesService';
-import { deleteRecipePhoto } from '../services/storageService';
 
 export function ViewRecipePage({ user, recipe, onBack, onEdit, onDeleted }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -35,10 +34,6 @@ export function ViewRecipePage({ user, recipe, onBack, onEdit, onDeleted }) {
     setDeleting(true);
 
     try {
-      if (recipe.photoPath) {
-        await deleteRecipePhoto(recipe.photoPath);
-      }
-
       await deleteRecipe(user.uid, recipe.id);
       onDeleted();
     } catch (error) {
