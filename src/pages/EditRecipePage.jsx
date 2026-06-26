@@ -3,6 +3,46 @@ import { ArrowLeft, Camera, Save, Trash2, X } from 'lucide-react';
 import { createRecipe, updateRecipe } from '../services/recipesService';
 import { deleteRecipePhoto, uploadRecipePhoto } from '../services/storageService';
 
+const SAVE_TIMEOUT_MS = 30000;
+
+function withTimeout(promise, label) {
+  let timeoutId;
+
+  const timeout = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      reject(new Error(`${label} demorou demais para responder.`));
+    }, SAVE_TIMEOUT_MS);
+  });
+
+  return Promise.race([promise, timeout]).finally(() => {
+    window.clearTimeout(timeoutId);
+  });
+}
+
+function getSaveErrorMessage(error) {
+  if (error?.code === 'permission-denied') {
+    return 'Sem permissao para salvar. Confira as regras do Firestore.';
+  }
+
+  if (error?.code === 'unauthenticated') {
+    return 'Sua sessao expirou. Saia e entre novamente.';
+  }
+
+  if (error?.code === 'unavailable' || error?.code === 'deadline-exceeded') {
+    return 'O Firebase nao respondeu. Confira sua conexao e tente novamente.';
+  }
+
+  if (error?.code === 'storage/unauthorized') {
+    return 'Sem permissao para salvar a foto. Confira as regras do Storage.';
+  }
+
+  if (error?.message?.includes('demorou demais')) {
+    return 'O Firebase demorou demais para responder. Confira se Firestore e Storage estao ativados.';
+  }
+
+  return 'Nao foi possivel salvar a receita.';
+}
+
 export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
   const isEditing = Boolean(recipe);
   const [title, setTitle] = useState(recipe?.title || '');
@@ -60,35 +100,47 @@ export function EditRecipePage({ user, recipe, onCancel, onSaved }) {
       let recipeId = recipe?.id;
 
       if (!recipeId) {
-        recipeId = await createRecipe(user.uid, {
-          title,
-          category,
-          content,
-          favorite: false
-        });
+        recipeId = await withTimeout(
+          createRecipe(user.uid, {
+            title,
+            category,
+            content,
+            favorite: false
+          }),
+          'Salvar receita'
+        );
       } else {
-        await updateRecipe(user.uid, recipeId, {
-          title,
-          category,
-          content
-        });
+        await withTimeout(
+          updateRecipe(user.uid, recipeId, {
+            title,
+            category,
+            content
+          }),
+          'Atualizar receita'
+        );
       }
 
       if (photoFile) {
-        const photo = await uploadRecipePhoto(user.uid, recipeId, photoFile, recipe?.photoPath);
-        await updateRecipe(user.uid, recipeId, photo);
+        const photo = await withTimeout(
+          uploadRecipePhoto(user.uid, recipeId, photoFile, recipe?.photoPath),
+          'Enviar foto'
+        );
+        await withTimeout(updateRecipe(user.uid, recipeId, photo), 'Salvar foto na receita');
       } else if (removePhoto && recipe?.photoPath) {
-        await deleteRecipePhoto(recipe.photoPath);
-        await updateRecipe(user.uid, recipeId, {
-          photoUrl: '',
-          photoPath: ''
-        });
+        await withTimeout(deleteRecipePhoto(recipe.photoPath), 'Remover foto');
+        await withTimeout(
+          updateRecipe(user.uid, recipeId, {
+            photoUrl: '',
+            photoPath: ''
+          }),
+          'Atualizar receita sem foto'
+        );
       }
 
       onSaved(recipeId);
     } catch (saveError) {
       console.error(saveError);
-      setError('Nao foi possivel salvar a receita.');
+      setError(getSaveErrorMessage(saveError));
     } finally {
       setSaving(false);
     }
