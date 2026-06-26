@@ -3,8 +3,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
-  query,
   serverTimestamp,
   setDoc,
   updateDoc
@@ -28,15 +26,19 @@ function recipeDocument(uid, recipeId) {
 }
 
 export function subscribeToRecipes(uid, onRecipes, onError) {
-  const recipesQuery = query(recipesCollection(uid), orderBy('updatedAt', 'desc'));
-
   return onSnapshot(
-    recipesQuery,
+    recipesCollection(uid),
     (snapshot) => {
       const recipes = snapshot.docs.map((recipeDoc) => ({
         id: recipeDoc.id,
         ...recipeDoc.data()
       }));
+
+      recipes.sort((a, b) => {
+        const aTime = a.updatedAt?.toMillis?.() || 0;
+        const bTime = b.updatedAt?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
 
       onRecipes(recipes);
     },

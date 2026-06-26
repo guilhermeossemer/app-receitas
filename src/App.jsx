@@ -11,6 +11,26 @@ function initialRoute() {
   return { name: 'recipes', recipeId: null };
 }
 
+function getRecipesErrorMessage(error) {
+  if (error?.code === 'permission-denied') {
+    return 'Sem permissao para ler suas receitas. Confira as regras do Firestore.';
+  }
+
+  if (error?.code === 'unauthenticated') {
+    return 'Sua sessao expirou. Saia e entre novamente.';
+  }
+
+  if (error?.code === 'unavailable' || error?.code === 'deadline-exceeded') {
+    return 'O Firestore nao respondeu. Confira sua conexao e tente novamente.';
+  }
+
+  if (error?.code === 'failed-precondition') {
+    return 'O Firestore ainda nao esta pronto neste projeto.';
+  }
+
+  return 'Nao foi possivel carregar suas receitas.';
+}
+
 export default function App() {
   const { user, initializing, logout } = useAuth();
   const [route, setRoute] = useState(initialRoute);
@@ -29,18 +49,31 @@ export default function App() {
     setRecipesLoading(true);
     setRecipesError('');
 
-    return subscribeToRecipes(
+    const loadingTimer = window.setTimeout(() => {
+      setRecipesLoading(false);
+      setRecipesError('O Firestore demorou demais para responder. Confira se o banco foi criado e se as regras foram publicadas.');
+    }, 15000);
+
+    const unsubscribe = subscribeToRecipes(
       user.uid,
       (nextRecipes) => {
+        window.clearTimeout(loadingTimer);
         setRecipes(nextRecipes);
+        setRecipesError('');
         setRecipesLoading(false);
       },
       (error) => {
+        window.clearTimeout(loadingTimer);
         console.error(error);
-        setRecipesError('Nao foi possivel carregar suas receitas.');
+        setRecipesError(getRecipesErrorMessage(error));
         setRecipesLoading(false);
       }
     );
+
+    return () => {
+      window.clearTimeout(loadingTimer);
+      unsubscribe();
+    };
   }, [user]);
 
   if (initializing) {
