@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Minhas Receitas">
+  <rect width="512" height="512" rx="112" fill="#19745a"/>
+  <path d="M143 122h186c41 0 74 33 74 74v195H179c-42 0-76-34-76-76V154c0-18 10-32 40-32Z" fill="#fff7ed"/>
+  <path d="M169 211h151M169 270h151M169 329h101" stroke="#19745a" stroke-width="32" stroke-linecap="round"/>
+  <path d="M375 177v214" stroke="#f3b33d" stroke-width="32" stroke-linecap="round"/>
+</svg>
