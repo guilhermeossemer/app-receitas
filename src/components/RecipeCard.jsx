@@ -1,10 +1,11 @@
-import { CookingPot, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import { AppMark } from './AppMark';
 
 export function RecipeCard({ recipe, onOpen, onToggleFavorite }) {
   return (
     <article className="recipe-card" onClick={onOpen}>
       <div className="recipe-thumb" aria-hidden="true">
-        {recipe.photoUrl ? <img src={recipe.photoUrl} alt="" /> : <CookingPot size={28} />}
+        {recipe.photoUrl ? <img src={recipe.photoUrl} alt="" /> : <AppMark />}
       </div>
       <div className="recipe-card-body">
         <h2>{recipe.title}</h2>

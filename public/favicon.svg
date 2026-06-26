@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Minhas Receitas">
   <rect width="64" height="64" rx="16" fill="#2F7D65"/>
   <path d="M23 17.5c-2.2-2.1-2.1-5.2.1-7.2M32 17.5c-2.2-2.1-2.1-5.2.1-7.2M41 17.5c-2.2-2.1-2.1-5.2.1-7.2" fill="none" stroke="#FFFDF9" stroke-width="3.2" stroke-linecap="round"/>
-  <path d="M15.5 30h33v13.2c0 6-4.8 10.8-10.8 10.8H26.3c-6 0-10.8-4.8-10.8-10.8V30Z" fill="#FFFDF9"/>
-  <path d="M19 26.5h26c2.2 0 4 1.8 4 4H15c0-2.2 1.8-4 4-4Z" fill="#E2A93B"/>
-  <path d="M15.5 35H11c-2.2 0-4 1.8-4 4s1.8 4 4 4h4.5M48.5 35H53c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4.5" fill="none" stroke="#FFFDF9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M15.5 31h33v12.2c0 6-4.8 10.8-10.8 10.8H26.3c-6 0-10.8-4.8-10.8-10.8V31Z" fill="#FFFDF9"/>
+  <g transform="rotate(-13 21 30)">
+    <path d="M19 25.5h26c2.2 0 4 1.8 4 4H15c0-2.2 1.8-4 4-4Z" fill="#E2A93B"/>
+    <circle cx="43.5" cy="22" r="4.4" fill="#F7F4EE"/>
+    <path d="M41.3 22h4.4" stroke="#2F7D65" stroke-width="2.4" stroke-linecap="round"/>
+  </g>
+  <path d="M15.5 36H11c-2.2 0-4 1.8-4 4s1.8 4 4 4h4.5M48.5 36H53c2.2 0 4 1.8 4 4s-1.8 4-4 4h-4.5" fill="none" stroke="#FFFDF9" stroke-width="4" stroke-linecap="round"/>
   <path d="M24 39.5h16" stroke="#2F7D65" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="43.5" cy="23" r="4.4" fill="#F7F4EE"/>
-  <path d="M41.3 23h4.4" stroke="#2F7D65" stroke-width="2.4" stroke-linecap="round"/>
 </svg>
