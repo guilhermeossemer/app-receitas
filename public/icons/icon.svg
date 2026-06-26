@@ -1,12 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Minhas Receitas">
   <rect width="512" height="512" rx="120" fill="#2F7D65"/>
   <path d="M181 143c-22-20-21-55 2-77M256 143c-22-20-21-55 2-77M331 143c-22-20-21-55 2-77" fill="none" stroke="#FFFDF9" stroke-width="26" stroke-linecap="round"/>
-  <path d="M119 247h274v101c0 49-40 89-89 89h-96c-49 0-89-40-89-89V247Z" fill="#FFFDF9"/>
-  <g transform="rotate(-13 146 238)">
-    <path d="M148 201h216c24 0 43 19 43 43H105c0-24 19-43 43-43Z" fill="#E2A93B"/>
-    <circle cx="352" cy="171" r="36" fill="#F7F4EE"/>
-    <path d="M334 171h36" stroke="#2F7D65" stroke-width="19" stroke-linecap="round"/>
-  </g>
-  <path d="M119 292H80c-23 0-41 18-41 41s18 41 41 41h39M393 292h39c23 0 41 18 41 41s-18 41-41 41h-39" fill="none" stroke="#FFFDF9" stroke-width="34" stroke-linecap="round"/>
+  <path d="M119 238h274v110c0 49-40 89-89 89h-96c-49 0-89-40-89-89V238Z" fill="#FFFDF9"/>
+  <path d="M148 209h216c24 0 43 19 43 43H105c0-24 19-43 43-43Z" fill="#E2A93B"/>
+  <path d="M119 283H80c-23 0-41 18-41 41s18 41 41 41h39M393 283h39c23 0 41 18 41 41s-18 41-41 41h-39" fill="none" stroke="#FFFDF9" stroke-width="34" stroke-linecap="round"/>
   <path d="M190 323h132" stroke="#2F7D65" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="352" cy="179" r="36" fill="#F7F4EE"/>
+  <path d="M334 179h36" stroke="#2F7D65" stroke-width="19" stroke-linecap="round"/>
 </svg>

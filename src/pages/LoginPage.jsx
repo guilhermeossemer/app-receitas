@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
-import { LogIn, Mail, UserPlus } from 'lucide-react';
+import { ChefHat, CookingPot, LogIn, Mail, UserPlus } from 'lucide-react';
 import { useAuth } from '../auth/AuthProvider';
-import { AppMark } from '../components/AppMark';
 
 const modes = {
   login: {
@@ -96,7 +95,8 @@ export function LoginPage() {
         <section className="auth-panel">
           <div className="brand-lockup">
             <span className="brand-icon brand-icon-large" aria-hidden="true">
-              <AppMark />
+              <CookingPot size={30} />
+              <ChefHat size={16} className="brand-icon-badge" />
             </span>
             <div>
               <p className="eyebrow">Minhas Receitas</p>
@@ -116,7 +116,8 @@ export function LoginPage() {
       <section className="auth-panel">
         <div className="brand-lockup">
           <span className="brand-icon brand-icon-large" aria-hidden="true">
-            <AppMark />
+            <CookingPot size={30} />
+            <ChefHat size={16} className="brand-icon-badge" />
           </span>
           <div>
             <p className="eyebrow">Minhas Receitas</p>
