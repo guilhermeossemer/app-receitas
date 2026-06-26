@@ -43,3 +43,20 @@ users/{uid}/recipes/{recipeId}/cover
 ## Regras sugeridas
 
 As regras de exemplo estao em `firestore.rules` e `storage.rules`. Elas permitem que cada usuario leia e escreva apenas os dados dentro da propria pasta.
+
+## Publicar no GitHub Pages
+
+O workflow em `.github/workflows/deploy-pages.yml` publica o app quando houver push na branch `main`.
+
+Antes de publicar, crie estes secrets no repositorio do GitHub em Settings > Secrets and variables > Actions:
+
+```txt
+VITE_FIREBASE_API_KEY
+VITE_FIREBASE_AUTH_DOMAIN
+VITE_FIREBASE_PROJECT_ID
+VITE_FIREBASE_STORAGE_BUCKET
+VITE_FIREBASE_MESSAGING_SENDER_ID
+VITE_FIREBASE_APP_ID
+```
+
+Em Settings > Pages, selecione GitHub Actions como origem da publicacao.

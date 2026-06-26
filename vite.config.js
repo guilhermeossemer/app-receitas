@@ -2,7 +2,10 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const base = process.env.GITHUB_PAGES === 'true' ? '/app-receitas/' : '/';
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -12,14 +15,15 @@ export default defineConfig({
         name: 'Minhas Receitas',
         short_name: 'Receitas',
         description: 'Salve, encontre e leia suas receitas no celular.',
+        lang: 'pt-BR',
         display: 'standalone',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         theme_color: '#19745a',
         background_color: '#f8faf7',
         icons: [
           {
-            src: '/icons/icon.svg',
+            src: `${base}icons/icon.svg`,
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable'
