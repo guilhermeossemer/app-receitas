@@ -28,15 +28,11 @@ function getSaveErrorMessage(error) {
   }
 
   if (error?.code === 'unavailable' || error?.code === 'deadline-exceeded') {
-    return 'O Firebase nao respondeu. Confira sua conexao e tente novamente.';
-  }
-
-  if (error?.code === 'storage/unauthorized') {
-    return 'Sem permissao para salvar a foto. Confira as regras do Storage.';
+    return 'O Firestore nao respondeu. Confira sua conexao e tente novamente.';
   }
 
   if (error?.message?.includes('demorou demais')) {
-    return 'O Firebase demorou demais para responder. Confira se Firestore e Storage estao ativados.';
+    return 'O Firestore demorou demais para responder. Confira se o banco foi criado e se as regras foram publicadas.';
   }
 
   return 'Nao foi possivel salvar a receita.';
